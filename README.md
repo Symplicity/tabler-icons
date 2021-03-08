@@ -1,12 +1,25 @@
 # Tabler Icons
 
-A set of over 950 free MIT-licensed high-quality SVG icons for you to use in your web projects. Each icon is designed on a 24x24 grid and a `2px` stroke.
+A set of over 1250 free MIT-licensed high-quality SVG icons for you to use in your web projects. Each icon is designed on a 24x24 grid and a `2px` stroke.
 
 **If you want to support my project and help me grow it, you can [become a sponsor on GitHub](https://github.com/sponsors/codecalm) or just [donate on PayPal](https://paypal.me/codecalm) :)**
+
+Icons search: https://tabler-icons.io/
+
+## Sponsors
+
+<a href="https://github.com/sponsors/codecalm">
+    <img src='https://raw.githubusercontent.com/tabler/static/main/sponsors.png'>
+  </a>
 
 ## Preview
 
 ![](https://raw.githubusercontent.com/tabler/tabler-icons/master/.github/icons.png)
+
+## Sponsor Tabler
+
+<a href="https://github.com/sponsors/codecalm" target="_blank"><img src="https://github.com/tabler/tabler/raw/dev/src/static/sponsor-banner-readme.png?raw=true" alt="Sponsor Tabler" /></a>
+
 
 ## Installation
 
@@ -112,6 +125,20 @@ To load a specific version replace `latest` with the desired version number.
 
 ```html
 <script src="https://unpkg.com/@tabler/icons@1.36.0/icons-react/dist/index.umd.js"></script>
+```
+
+### Svelte
+
+You can use [`tabler-icons-svelte`](https://github.com/benflap/tabler-icons-svelte) to use icons in your Svelte projects (see [example](https://svelte.dev/repl/e80dc63d7019431692b10a77525e7f99?version=3.31.0)):
+
+```js
+<script>
+    import { CurrencyBitcoin, BrandGithub, CircleX } from "tabler-icons-svelte";
+</script>
+
+<CurrencyBitcoin />
+<BrandGithub size="48" strokeWidth="1" />
+<CircleX />
 ```
 
 ## Multiple strokes

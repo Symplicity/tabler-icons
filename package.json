@@ -1,6 +1,6 @@
 {
   "name": "@tabler/icons",
-  "version": "1.38.1",
+  "version": "1.39.1",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/tabler/tabler-icons.git"
@@ -65,6 +65,7 @@
     "glob": "7.1.6",
     "gulp": "4.0.2",
     "gulp-iconfont": "10.0.3",
+    "gulp-svgo": "^2.2.1",
     "gulp-zip": "5.0.2",
     "lodash.template": "4.5.0",
     "minimist": "1.2.5",

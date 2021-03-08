@@ -6,6 +6,7 @@ const gulp = require('gulp'),
 	p = require('./package.json'),
 	csv = require('csv-parser'),
 	zip = require('gulp-zip'),
+	svgo = require('gulp-svgo'),
 	puppeteer = require('puppeteer'),
 	outlineStroke = require('svg-outline-stroke'),
 	iconfont = require('gulp-iconfont'),
@@ -198,8 +199,8 @@ gulp.task('iconfont-svg-outline', function (cb) {
 
 		let iconfontUnicode = {};
 
-		if (fs.existsSync('./iconfont-unicode.json')) {
-			iconfontUnicode = require('./iconfont-unicode');
+		if (fs.existsSync('./.build/iconfont-unicode.json')) {
+			iconfontUnicode = require('./.build/iconfont-unicode');
 		}
 
 		await asyncForEach(files, async function (file) {
@@ -234,11 +235,28 @@ gulp.task('iconfont-svg-outline', function (cb) {
 	});
 });
 
+gulp.task('iconfont-optimize', function() {
+	return gulp.src('icons-outlined/*')
+		.pipe(svgo())
+		.pipe(gulp.dest('icons-outlined'));
+});
+
+gulp.task('iconfont-fix-outline', function(cb) {
+	// correct svg outline directions in a child process using fontforge
+	const generate = cp.spawn("fontforge", ["-lang=py", "-script", "./fix-outline.py"], { stdio: 'inherit' });
+	generate.on("close", function (code) {
+		console.log(`Correcting svg outline directions exited with code ${code}`);
+		if (!code) {
+			cb();
+		}
+	});
+});
+
 gulp.task('iconfont', function () {
 	let maxUnicode = 59905;
 
-	if (fs.existsSync('./iconfont-unicode.json')) {
-		const iconfontUnicode = require('./iconfont-unicode');
+	if (fs.existsSync('./.build/iconfont-unicode.json')) {
+		const iconfontUnicode = require('./.build/iconfont-unicode');
 
 		for (const name in iconfontUnicode) {
 			const unicode = parseInt(iconfontUnicode[name], 16);
@@ -253,9 +271,12 @@ gulp.task('iconfont', function () {
 		.pipe(iconfont({
 			fontName: 'tabler-icons',
 			prependUnicode: true,
-			formats: ['ttf', 'eot', 'woff', 'woff2'],
+			formats: ['ttf', 'eot', 'woff', 'woff2', 'svg'],
 			normalize: true,
-			startUnicode: maxUnicode
+			startUnicode: maxUnicode,
+			fontHeight: 1000,
+			descent: 100,
+			ascent: 986.5
 		}))
 		.on('glyphs', function (glyphs, options) {
 			//glyphs json
@@ -270,7 +291,7 @@ gulp.task('iconfont', function () {
 				glyphsObject[glyph.name] = glyph.unicode[0].codePointAt(0).toString(16);
 			});
 
-			fs.writeFileSync(`iconfont-unicode.json`, JSON.stringify(glyphsObject));
+			fs.writeFileSync(`./.build/iconfont-unicode.json`, JSON.stringify(glyphsObject));
 
 			//css
 			options['glyphs'] = glyphs;
@@ -304,7 +325,25 @@ gulp.task('iconfont-css', function (cb) {
 	});
 });
 
-gulp.task('build-iconfont', gulp.series('iconfont-prepare', 'iconfont-svg-outline', 'iconfont', 'iconfont-css', 'iconfont-clean'));
+gulp.task('update-tags-unicode', function(cb) {
+	let tags = require('./tags.json'),
+		unicodes = require('./.build/iconfont-unicode.json');
+
+	for(let i in tags) {
+		tags[i] = {
+			...tags[i],
+			unicode: unicodes[i],
+		}
+	}
+
+	console.log('tags', tags);
+
+	fs.writeFileSync(`tags.json`, JSON.stringify(tags, null, 2));
+
+	cb();
+});
+
+gulp.task('build-iconfont', gulp.series('iconfont-prepare', 'iconfont-svg-outline', 'iconfont-fix-outline', 'iconfont-optimize', 'iconfont', 'iconfont-css', 'iconfont-clean', 'update-tags-unicode'));
 
 gulp.task('build-zip', function () {
 	const version = p.version;
