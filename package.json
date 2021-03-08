@@ -26,6 +26,7 @@
     "icons-react/index.d.ts",
     "icons-react/dist/*",
     "iconfont/*",
+    "symplicity/*",
     "tabler-sprite.svg",
     "tabler-sprite-nostroke.svg"
   ],
